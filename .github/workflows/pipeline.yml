@@ -73,7 +73,7 @@ jobs:
 
       - name: Run pytest with coverage
         run: |
-          pytest api/tests/ \
+          pytest api/test/ \
             --cov=api \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
