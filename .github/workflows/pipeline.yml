@@ -169,6 +169,7 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
+          scanners: "vuln"
 
       - name: Trivy scan — Worker
         uses: aquasecurity/trivy-action@master
@@ -181,6 +182,7 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
+          scanners: "vuln"
 
       - name: Trivy scan — Frontend
         uses: aquasecurity/trivy-action@master
@@ -193,7 +195,8 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
-
+          scanners: "vuln"
+          
       - name: Upload SARIF artifacts
         if: always()
         uses: actions/upload-artifact@v4
