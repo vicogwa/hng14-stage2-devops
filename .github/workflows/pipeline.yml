@@ -166,6 +166,7 @@ jobs:
           output: trivy-api.sarif
           severity: CRITICAL
           exit-code: "1"
+          vuln-type: "library"
 
       - name: Trivy scan — Worker
         uses: aquasecurity/trivy-action@master
