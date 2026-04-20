@@ -160,6 +160,8 @@ jobs:
 
       - name: Trivy scan — API
         uses: aquasecurity/trivy-action@master
+        env:
+          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           image-ref: "${{ env.REGISTRY }}/api:latest"
           format: sarif
@@ -167,10 +169,11 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
-          skip-version-check: true
 
       - name: Trivy scan — Worker
         uses: aquasecurity/trivy-action@master
+        env:
+          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           image-ref: "${{ env.REGISTRY }}/worker:latest"
           format: sarif
@@ -178,10 +181,11 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
-          skip-version-check: true
 
       - name: Trivy scan — Frontend
         uses: aquasecurity/trivy-action@master
+        env:
+          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           image-ref: "${{ env.REGISTRY }}/frontend:latest"
           format: sarif
@@ -189,7 +193,6 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
-          skip-version-check: true
 
       - name: Upload SARIF artifacts
         if: always()
