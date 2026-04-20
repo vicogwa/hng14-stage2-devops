@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 node_modules/
 coverage.xml
-*.sarif
+*.sarifapi/.env
+.env
