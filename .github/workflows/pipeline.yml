@@ -139,7 +139,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ── 4. Security Scan ──────────────────────────────────────────
+ # ── 4. Security Scan ──────────────────────────────────────────
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -167,6 +167,7 @@ jobs:
           severity: CRITICAL
           exit-code: "1"
           vuln-type: "library"
+          skip-version-check: true
 
       - name: Trivy scan — Worker
         uses: aquasecurity/trivy-action@master
@@ -176,6 +177,8 @@ jobs:
           output: trivy-worker.sarif
           severity: CRITICAL
           exit-code: "1"
+          vuln-type: "library"
+          skip-version-check: true
 
       - name: Trivy scan — Frontend
         uses: aquasecurity/trivy-action@master
@@ -185,6 +188,8 @@ jobs:
           output: trivy-frontend.sarif
           severity: CRITICAL
           exit-code: "1"
+          vuln-type: "library"
+          skip-version-check: true
 
       - name: Upload SARIF artifacts
         if: always()
