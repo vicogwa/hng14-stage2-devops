@@ -1,26 +1,28 @@
 import pytest
+import sys
+import os
 from unittest.mock import MagicMock, patch
-from fastapi.testclient import TestClient
+
+# Add api directory to path so main.py can be imported directly
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 
 @pytest.fixture(autouse=True)
 def mock_redis():
-    """Patch redis.Redis for every test — no live Redis required."""
     with patch("redis.Redis") as mock_cls:
         mock_instance = MagicMock()
         mock_instance.ping.return_value = True
         mock_cls.return_value = mock_instance
-        # Re-import app after patching so it picks up the mock
-        import importlib
-        import api.main as main_module
-        importlib.reload(main_module)
         yield mock_instance
 
 
 @pytest.fixture()
 def client(mock_redis):
-    from api.main import app
-    return TestClient(app)
+    from fastapi.testclient import TestClient
+    import importlib
+    import main as main_module
+    importlib.reload(main_module)
+    return TestClient(main_module.app)
 
 
 def test_health_returns_ok(client, mock_redis):
@@ -37,7 +39,7 @@ def test_create_job_returns_job_id(client, mock_redis):
     assert resp.status_code == 200
     data = resp.json()
     assert "job_id" in data
-    assert len(data["job_id"]) == 36  # UUID4 length
+    assert len(data["job_id"]) == 36
 
 
 def test_get_existing_job_returns_status(client, mock_redis):

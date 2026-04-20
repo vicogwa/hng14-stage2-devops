@@ -24,7 +24,7 @@ jobs:
         run: pip install flake8
 
       - name: flake8 — API
-        run: flake8 api/ --max-line-length=120 --exclude=api/tests
+        run: flake8 api/ --max-line-length=120 --exclude=api/test
 
       - name: flake8 — Worker
         run: flake8 worker/ --max-line-length=120
@@ -72,10 +72,11 @@ jobs:
         run: pip install -r api/requirements.txt
 
       - name: Run pytest with coverage
+        working-directory: api
         run: |
-          pytest api/test/ \
-            --cov=api \
-            --cov-report=xml:coverage.xml \
+          pytest test/ \
+            --cov=. \
+            --cov-report=xml:../coverage.xml \
             --cov-report=term-missing \
             -v
 
@@ -151,7 +152,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Registry is ephemeral per job — rebuild images locally for scanning
       - name: Build images for scanning
         run: |
           docker build -t $REGISTRY/api:latest ./api
@@ -218,7 +218,6 @@ jobs:
         run: |
           set -e
 
-          # Submit a job
           RESPONSE=$(curl -sf -X POST http://localhost:3000/submit \
             -H "Content-Type: application/json")
           echo "Submit response: $RESPONSE"
@@ -227,7 +226,6 @@ jobs:
             "import sys, json; print(json.load(sys.stdin)['job_id'])")
           echo "Job ID: $JOB_ID"
 
-          # Poll for up to 60 seconds
           TIMEOUT=60
           ELAPSED=0
           while [ $ELAPSED -lt $TIMEOUT ]; do
@@ -260,7 +258,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Skip deploy if no server configured
+        if: ${{ env.DEPLOY_HOST == '' }}
+        run: |
+          echo "No DEPLOY_HOST configured — skipping deploy"
+          exit 0
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+
       - name: Rolling deploy via SSH
+        if: ${{ env.DEPLOY_HOST != '' }}
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -297,7 +304,6 @@ jobs:
               done
 
               echo "ERROR: $SERVICE failed health check — aborting deploy"
-              # Leave old container running; do not proceed
               return 1
             }
 
