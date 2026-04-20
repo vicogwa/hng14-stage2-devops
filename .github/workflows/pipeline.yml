@@ -157,45 +157,50 @@ jobs:
           docker build -t $REGISTRY/api:latest ./api
           docker build -t $REGISTRY/worker:latest ./worker
           docker build -t $REGISTRY/frontend:latest ./frontend
+          
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sh -s -- -b /usr/local/bin v0.69.3
+
 
       - name: Trivy scan — API
-        uses: aquasecurity/trivy-action@master
+        run: |
+          trivy image \
+            --severity CRITICAL \
+            --vuln-type library \
+            --scanners vuln \
+            --skip-version-check \
+            --format sarif \
+            --output trivy-api.sarif \
+            --exit-code 1 \
+            $REGISTRY/api:latest
         env:
           TRIVY_SKIP_VERSION_CHECK: "true"
-        with:
-          image-ref: "${{ env.REGISTRY }}/api:latest"
-          format: table
-          output: trivy-api.sarif
-          severity: CRITICAL
-          exit-code: "1"
-          vuln-type: "library"
-          scanners: "vuln"
 
       - name: Trivy scan — Worker
-        uses: aquasecurity/trivy-action@master
-        env:
-          TRIVY_SKIP_VERSION_CHECK: "true"
-        with:
-          image-ref: "${{ env.REGISTRY }}/worker:latest"
-          format: sarif
-          output: trivy-worker.sarif
-          severity: CRITICAL
-          exit-code: "1"
-          vuln-type: "library"
-          scanners: "vuln"
+        run: |
+          trivy image \
+            --severity CRITICAL \
+            --vuln-type library \
+            --scanners vuln \
+            --skip-version-check \
+            --format sarif \
+            --output trivy-worker.sarif \
+            --exit-code 1 \
+            $REGISTRY/worker:latest
 
       - name: Trivy scan — Frontend
-        uses: aquasecurity/trivy-action@master
-        env:
-          TRIVY_SKIP_VERSION_CHECK: "true"
-        with:
-          image-ref: "${{ env.REGISTRY }}/frontend:latest"
-          format: sarif
-          output: trivy-frontend.sarif
-          severity: CRITICAL
-          exit-code: "1"
-          vuln-type: "library"
-          scanners: "vuln"
+        run: |
+          trivy image \
+            --severity CRITICAL \
+            --vuln-type library \
+            --scanners vuln \
+            --skip-version-check \
+            --format sarif \
+            --output trivy-frontend.sarif \
+            --exit-code 1 \
+            $REGISTRY/frontend:latest
 
       - name: Upload SARIF artifacts
         if: always()
