@@ -164,7 +164,7 @@ jobs:
           TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           image-ref: "${{ env.REGISTRY }}/api:latest"
-          format: sarif
+          format: table
           output: trivy-api.sarif
           severity: CRITICAL
           exit-code: "1"
@@ -196,7 +196,7 @@ jobs:
           exit-code: "1"
           vuln-type: "library"
           scanners: "vuln"
-          
+
       - name: Upload SARIF artifacts
         if: always()
         uses: actions/upload-artifact@v4
