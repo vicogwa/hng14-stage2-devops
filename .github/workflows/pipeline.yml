@@ -157,7 +157,7 @@ jobs:
           docker build -t $REGISTRY/api:latest ./api
           docker build -t $REGISTRY/worker:latest ./worker
           docker build -t $REGISTRY/frontend:latest ./frontend
-          
+
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
@@ -222,7 +222,7 @@ jobs:
           cat > .env << 'EOF'
           REDIS_HOST=redis
           REDIS_PORT=6379
-          REDIS_PASSWORD=
+          REDIS_PASSWORD=integration-test-password
           REDIS_QUEUE_KEY=job
           FRONTEND_PORT=3000
           ALLOWED_ORIGINS=*
